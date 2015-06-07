@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/aop
+       http://www.springframework.org/schema/aop/spring-aop-2.0.xsd">
+
+
+
+    <!--The p:beanbags attribute needs to have the namespace schema from above, the same as <property name="beanBags">500</property>-->
+    <bean id="duke"
+          class="book.Juggler"
+            >
+        <!--<constructor-arg value="100000"/>-->
+        <!--<constructor-arg ref="sonnet29"/>-->
+        <!--<property name="beanBags" value="100"/>-->
+        <!--<property name="beanBags" value="#{BeanBags.getBeanBags}"/>-->
+    </bean>
+
+
+    <bean id="carl"
+          class="book.PoeticJuggler"
+          scope="prototype"
+            >
+        <constructor-arg value="10"/>
+        <constructor-arg ref="sonnet29"/>
+        <!--<property name="beanBags" value="#{T(java.lang.Math).PI}" />-->
+        <!--<property name="beanBags" value="#{T(java.lang.Math).random() + 50}" />-->
+        <property name="env" value="#{systemEnvironment['HOME']}"/>
+        <!--<property name="beanBags" value="#{BeanBags.getBeanBags()}"/>-->
+        <!--<property name="beanBags" value="#{duke.beanBags}"/>-->
+    </bean>
+
+    <!--<bean id="BeanBags"-->
+          <!--class="book.BeanBags"></bean>-->
+
+    <bean id="sonnet29"
+          class="book.Poem" >
+    </bean>
+
+    <bean id="theStage"
+          class="book.Stage"
+          factory-method="getInstance" />
+
+    <bean id="ticket"
+          class="book.Ticket"
+          scope="prototype" />
+
+    <bean id="auditorium"
+          class="book.Auditorium"
+          init-method="turnOnLights"
+          destroy-method="turnOffLights"
+            >
+
+    </bean>
+
+    <bean id="audiences"
+          class="book.audience">
+
+    </bean>
+
+    <aop:aspectj-autoproxy />
+    <aop:config>
+        <aop:aspect ref="audiences">
+            <aop:pointcut id="performance" expression="execution(* book.Performer.perform(..))" />
+
+            <aop:before pointcut-ref="performance" method="takeSeats"/>
+            <aop:before pointcut-ref="performance" method="turnOffCellPhones" />
+            <aop:after-returning pointcut-ref="performance" method="applause" />
+            <aop:after-throwing pointcut-ref="performance" method="demandRefund" />
+        </aop:aspect>
+    </aop:config>
+
+</beans>
